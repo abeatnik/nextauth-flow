@@ -1,8 +1,10 @@
 "use client";
-import NextAuth, { NextAuthOptions, User } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "../../../lib/prismadb";
+import { User } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 export const authOptions: NextAuthOptions = {
     // Configure one or more authentication providers
@@ -27,28 +29,21 @@ export const authOptions: NextAuthOptions = {
                 // Add logic here to look up the user from the credentials supplied
                 const { username, password } = credentials as any;
 
-                // const res = await fetch("http://localhost:8000/auth/login", {
-                //     method: "POST",
-                //     headers: { "Content-Type": "application/json" },
-                //     body: JSON.stringify({
-                //         username,
-                //         password,
-                //     }),
-                // });
-
-                // const user = await res.json();
-                // const user: User = { id: "demo user" };
-
-                // if (user) {
-                //     // Any object returned will be saved in `user` property of the JWT
-                //     return user;
-                // } else {
+                const user: User | null = await prisma.user.findUnique({
+                    where: {
+                        username: username,
+                    },
+                });
+                const hash: string = user?.password || "";
+                const valid = await bcrypt.compare(password, hash);
+                if (valid) {
+                    return user;
+                } else {
+                    return null;
+                }
                 // If you return null then an error will be displayed advising the user to check their details.
-                return null;
-
                 // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
             },
-            // },
         }),
         //...add more providers here
     ],

@@ -1,7 +1,7 @@
 import prisma from "../../lib/prismadb";
 import type { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcrypt";
-import { User } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 
 export default async function handle(
     req: NextApiRequest,
@@ -12,8 +12,6 @@ export default async function handle(
         password,
         role,
     }: { username: string; password: string; role: string } = req.body;
-
-    const newUser: User = { username, password, role };
 
     const saltRounds = 10;
     const hash = bcrypt.hashSync(password, saltRounds);
@@ -26,6 +24,8 @@ export default async function handle(
         },
         select: {
             id: true,
+            username: true,
+            role: true,
         },
     });
     res.json(user);

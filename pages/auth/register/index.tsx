@@ -20,19 +20,22 @@ const Register = () => {
     } = useForm<FormData>();
 
     const onSubmit = async (data: FormData) => {
-        const res = await fetch("api/register", {
+        const result = await fetch("/api/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
         });
-        if (res.ok) {
-            signIn("credentials", {
-                username: data.username,
-                password: data.password,
-                redirect: true,
-                callbackUrl: "/",
-            });
-        }
+
+        const res = result.json();
+        console.log(res);
+        // if (res.ok) {
+        //     signIn("credentials", {
+        //         username: data.username,
+        //         password: data.password,
+        //         redirect: true,
+        //         callbackUrl: "/",
+        //     });
+        // }
     };
 
     const onError = (e: FieldErrors<FormData>) => console.log(e);
