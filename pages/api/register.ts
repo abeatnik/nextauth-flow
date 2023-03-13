@@ -8,23 +8,27 @@ export default async function handle(
     res: NextApiResponse
 ) {
     const {
-        username,
+        name,
+        email,
         password,
         role,
-    }: { username: string; password: string; role: string } = req.body;
+    }: { name: string; email: string; password: string; role: string } =
+        req.body;
 
     const saltRounds = 10;
     const hash = bcrypt.hashSync(password, saltRounds);
 
     const user = await prisma.user.create({
         data: {
-            username: username,
+            name: name,
+            email: email,
             password: hash,
             role: role,
         },
         select: {
             id: true,
-            username: true,
+            name: true,
+            email: true,
             role: true,
         },
     });

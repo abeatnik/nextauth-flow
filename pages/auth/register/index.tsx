@@ -4,9 +4,11 @@ import { FieldErrors, useForm } from "react-hook-form";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { User } from "@prisma/client";
 
 type FormData = {
-    username: string;
+    name: string;
+    email: string;
     password: string;
     role: string;
 };
@@ -26,16 +28,16 @@ const Register = () => {
             body: JSON.stringify(data),
         });
 
-        const res = result.json();
-        console.log(res);
-        // if (res.ok) {
-        //     signIn("credentials", {
-        //         username: data.username,
-        //         password: data.password,
-        //         redirect: true,
-        //         callbackUrl: "/",
-        //     });
-        // }
+        const user: User | null = await result.json();
+
+        if (user) {
+            signIn("credentials", {
+                name: data.name,
+                password: data.password,
+                redirect: true,
+                callbackUrl: "/",
+            });
+        }
     };
 
     const onError = (e: FieldErrors<FormData>) => console.log(e);
@@ -49,14 +51,27 @@ const Register = () => {
                     </h2>
                     <div className="p-2">
                         <label
-                            htmlFor="username"
+                            htmlFor="name"
                             className="text-beige-d text-comfortaa"
                         >
-                            username:{" "}
+                            name:{" "}
                         </label>
                         <input
                             type="text"
-                            {...register("username")}
+                            {...register("name")}
+                            className="bg-beige-d rounded-md p-2"
+                        />
+                    </div>
+                    <div className="p-2">
+                        <label
+                            htmlFor="email"
+                            className="text-beige-d text-comfortaa"
+                        >
+                            email:{" "}
+                        </label>
+                        <input
+                            type="text"
+                            {...register("email")}
                             className="bg-beige-d rounded-md p-2"
                         />
                     </div>

@@ -5,7 +5,7 @@ import { FieldErrors, useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 
 type FormData = {
-    username: string;
+    name: string;
     password: string;
 };
 
@@ -20,12 +20,12 @@ const Login = () => {
     const onSubmit = async (data: FormData) => {
         console.log(data);
         const result = await signIn("credentials", {
-            username: data.username,
+            name: data.name,
             password: data.password,
             redirect: true,
             callbackUrl: "/",
         });
-        console.log(result);
+        console.log({ result });
     };
 
     const onError = (e: FieldErrors<FormData>) => console.log(e);
@@ -39,14 +39,14 @@ const Login = () => {
                     </h2>
                     <div className="p-2">
                         <label
-                            htmlFor="username"
+                            htmlFor="name"
                             className="text-beige-d text-comfortaa"
                         >
-                            username:{" "}
+                            name:{" "}
                         </label>
                         <input
                             type="text"
-                            {...register("username")}
+                            {...register("name")}
                             className="bg-beige-d rounded-md p-2"
                         />
                     </div>

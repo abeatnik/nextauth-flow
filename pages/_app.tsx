@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { AppProps } from "next/app";
-import NavBar from "./NavBar";
+import NavBar from "../components/NavBar";
 import { SessionProvider } from "next-auth/react";
 import { Comfortaa, Karla } from "next/font/google";
 
