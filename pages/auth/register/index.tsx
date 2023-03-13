@@ -1,15 +1,17 @@
 "use client";
 import React from "react";
-import Link from "next/link";
 import { FieldErrors, useForm } from "react-hook-form";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 type FormData = {
     username: string;
     password: string;
+    role: string;
 };
 
-const Login = () => {
+const Register = () => {
     const {
         register,
         setValue,
@@ -18,14 +20,19 @@ const Login = () => {
     } = useForm<FormData>();
 
     const onSubmit = async (data: FormData) => {
-        console.log(data);
-        const result = await signIn("credentials", {
-            username: data.username,
-            password: data.password,
-            redirect: true,
-            callbackUrl: "/",
+        const res = await fetch("api/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
         });
-        console.log(result);
+        if (res.ok) {
+            signIn("credentials", {
+                username: data.username,
+                password: data.password,
+                redirect: true,
+                callbackUrl: "/",
+            });
+        }
     };
 
     const onError = (e: FieldErrors<FormData>) => console.log(e);
@@ -35,7 +42,7 @@ const Login = () => {
             <div className="p-6 shadow-sm bg-white rounded-md w-2/3 flex flex-col gap-2">
                 <form onSubmit={handleSubmit(onSubmit, onError)}>
                     <h2 className="text-sage-d text-comfortaa text-2xl text-center">
-                        Login
+                        Register
                     </h2>
                     <div className="p-2">
                         <label
@@ -63,22 +70,29 @@ const Login = () => {
                             className="bg-beige-d rounded-md p-2"
                         />
                     </div>
+                    <label htmlFor="role-select">Choose a role:</label>
+                    <select id="role-select" {...register("role")}>
+                        <option value="">--Please choose an option--</option>
+                        <option value="user">user</option>
+                        <option value="admin">admin</option>
+                        <option value="chief-admin">chief admin</option>
+                    </select>
+                    <p>
+                        Already a user?{" "}
+                        <Link className="text-sage-d" href={"/auth/login"}>
+                            Login
+                        </Link>
+                    </p>
                     <button
                         type="submit"
                         className=" w-4/5 text-beige-d text-comfortaa p-2 text-center border-2 border-beige-d rounded-md self-center"
                     >
                         Submit
                     </button>
-                    <p>
-                        Not yet a user?{" "}
-                        <Link className="text-sage-d" href={"/auth/register"}>
-                            Register
-                        </Link>
-                    </p>
                 </form>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default Register;
