@@ -5,6 +5,8 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "../../../lib/prismadb";
 import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { JWT } from "next-auth/jwt";
+import { AdapterUser } from "next-auth/adapters";
 
 export const authOptions: NextAuthOptions = {
     // Configure one or more authentication providers
@@ -38,7 +40,7 @@ export const authOptions: NextAuthOptions = {
                     const hash: string = user?.password || "";
                     const valid = await bcrypt.compare(password, hash);
                     if (valid) {
-                        console.log({ user });
+                        // console.log({ user });
                         return user;
                     }
                 }
@@ -51,10 +53,21 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         async jwt({ token, user }) {
-            return { ...token, user };
+            console.log("typeof user:", typeof user);
+            console.log("jwt callback function returns:", {
+                ...token,
+                user,
+            });
+            const userObj: any = Object.assign({}, user);
+            const role = userObj.hasOwnProperty("role")
+                ? userObj?.role
+                : token.role;
+            console.log({ role });
+            return { ...token, role, user };
         },
         async session({ session, token, user }) {
             session.user = token as any;
+            console.log("session callback function returns: ", { session });
             return session;
         },
     },
@@ -62,25 +75,6 @@ export const authOptions: NextAuthOptions = {
     session: { strategy: "jwt" },
     jwt: {
         maxAge: 60 * 60 * 24 * 30,
-        // encode: async ({ secret, token, maxAge }) => {
-        //     const jwtClaims = {
-        //         sub: token.id.toString(),
-        //         name: token.name,
-        //         email: token.email,
-        //         iat: Date.now() / 1000,
-        //         exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60,
-        //         "https://hasura.io/jwt/claims": {
-        //             "x-hasura-allowed-roles": ["user"],
-        //             "x-hasura-default-role": "user",
-        //             "x-hasura-role": "user",
-        //             "x-hasura-user-id": token.id,
-        //         },
-        //     };
-        //     const encodedToken = jwt.sign(jwtClaims, secret, {
-        //         algorithm: "HS256",
-        //     });
-        //     return encodedToken;
-        // },
     },
     pages: {
         signIn: "/auth/login",
