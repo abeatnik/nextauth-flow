@@ -90,7 +90,6 @@ const Register = () => {
                     </div>
                     <label htmlFor="role-select">Choose a role:</label>
                     <select id="role-select" {...register("role")}>
-                        <option value="">--Please choose an option--</option>
                         <option value="user">user</option>
                         <option value="admin">admin</option>
                         <option value="chief-admin">chief admin</option>

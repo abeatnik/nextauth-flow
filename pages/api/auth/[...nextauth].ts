@@ -5,6 +5,8 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "../../../lib/prismadb";
 import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
+import * as dotenv from "dotenv";
+dotenv.config();
 import { JWT } from "next-auth/jwt";
 import { AdapterUser } from "next-auth/adapters";
 
@@ -53,25 +55,25 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         async jwt({ token, user }) {
-            console.log("typeof user:", typeof user);
-            console.log("jwt callback function returns:", {
-                ...token,
-                user,
-            });
+            // console.log("typeof user:", typeof user);
+            // console.log("jwt callback function returns:", {
+            //     ...token,
+            //     user,
+            // });
             const userObj: any = Object.assign({}, user);
             const role = userObj.hasOwnProperty("role")
                 ? userObj?.role
                 : token.role;
-            console.log({ role });
             return { ...token, role, user };
         },
         async session({ session, token, user }) {
+            // console.log({ token });
             session.user = token as any;
-            console.log("session callback function returns: ", { session });
+            // console.log("session callback function returns: ", { session });
             return session;
         },
     },
-    // secret: process.env.JWT_SECRET,
+    secret: process.env.NEXTAUTH_SECRET,
     session: { strategy: "jwt" },
     jwt: {
         maxAge: 60 * 60 * 24 * 30,
